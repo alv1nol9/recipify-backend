@@ -1,6 +1,6 @@
 from flask import request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from models import db, User, Recipe, Comment
+from server.models import db, User, Recipe, Comment
 from auth import register_user, login_user, get_current_user
 
 def init_routes(app):
