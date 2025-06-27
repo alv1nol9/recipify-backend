@@ -1,6 +1,6 @@
 # server/seed.py
 from server.app import create_app, db
-from models import User, Recipe, Comment  # Import your Comment model
+from server.models import User, Recipe, Comment  # Import your Comment model
 from werkzeug.security import generate_password_hash
 from faker import Faker
 import random
