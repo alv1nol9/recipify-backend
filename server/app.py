@@ -3,16 +3,16 @@ from flask_cors import CORS
 from flask_migrate import Migrate
 from server.config import Config
 from server.models import db
-from controllers.routes import init_routes
+from server.controllers.routes import init_routes  
 
 def create_app():
     app = Flask(__name__)
-    app.config.from_object(Config)  # Load config from class
+    app.config.from_object(Config)
 
     db.init_app(app)
-    migrate = Migrate(app, db)  # <-- PASS db here
+    migrate = Migrate(app, db)
 
-    CORS(app)  # Optional: allow frontend to access
+    CORS(app)
 
     with app.app_context():
         db.create_all()
