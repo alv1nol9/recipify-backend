@@ -17,11 +17,11 @@ def create_app():
     with app.app_context():
         db.create_all()
 
-    app.register_blueprint(init_routes())
+    init_routes(app)  
 
     return app
 
-app = create_app()  
+app = create_app()
 
 if __name__ == '__main__':
     app.run(debug=True)
