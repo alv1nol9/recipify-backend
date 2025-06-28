@@ -1,12 +1,3 @@
-from flask import Flask, send_from_directory
-from flask_cors import CORS
-from flask_migrate import Migrate
-import os
-
-from server.config import Config
-from server.models.base import db
-from server.controllers.routes import init_routes
-
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
@@ -14,6 +5,8 @@ def create_app():
     db.init_app(app)
     migrate = Migrate(app, db)
     CORS(app)
+
+    from server import models  # 👈 THIS IS CRITICAL! Don't skip it.
 
     init_routes(app)
 
@@ -26,8 +19,3 @@ def create_app():
         return send_from_directory(uploads_dir, filename)
 
     return app
-
-app = create_app()
-
-if __name__ == '__main__':
-    app.run(debug=True)
