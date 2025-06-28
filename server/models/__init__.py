@@ -1,9 +1,6 @@
-from flask_sqlalchemy import SQLAlchemy
-
-db = SQLAlchemy()
-
+from .user import User
 from .recipe import Recipe
 from .comment import Comment
-from .user import User
 
-__all__ = ['db', 'User', 'Recipe', 'Comment']
+User.recipes = db.relationship('Recipe', backref='author', lazy=True)
+User.comments = db.relationship('Comment', backref='author', lazy=True)
