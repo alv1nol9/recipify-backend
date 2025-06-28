@@ -6,10 +6,8 @@ from faker import Faker
 import random
 from datetime import datetime, timedelta
 
-# Initialize the app
-app = create_app()
 
-# Initialize Faker
+app = create_app()
 fake = Faker()
 
 def clear_data():
@@ -22,7 +20,7 @@ def clear_data():
 def seed_users(num=5):
     """Seed users"""
     with app.app_context():
-        # Add a test user with known credentials
+        
         test_user = User(
             username="testuser",
             email="test@example.com",
@@ -30,7 +28,6 @@ def seed_users(num=5):
         )
         db.session.add(test_user)
         
-        # Add fake users
         for _ in range(num - 1):
             user = User(
                 username=fake.unique.user_name(),

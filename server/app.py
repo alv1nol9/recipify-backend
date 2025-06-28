@@ -1,9 +1,11 @@
-from flask import Flask
+from flask import Flask, send_from_directory
 from flask_cors import CORS
 from flask_migrate import Migrate
+import os
+
 from server.config import Config
 from server.models import db
-from server.controllers.routes import init_routes  
+from server.controllers.routes import init_routes
 
 def create_app():
     app = Flask(__name__)
@@ -11,13 +13,17 @@ def create_app():
 
     db.init_app(app)
     migrate = Migrate(app, db)
-
     CORS(app)
+
+    init_routes(app)
 
     with app.app_context():
         db.create_all()
 
-    init_routes(app)  
+    @app.route('/uploads/<path:filename>')
+    def uploaded_file(filename):
+        uploads_dir = os.path.join(os.getcwd(), 'uploads')
+        return send_from_directory(uploads_dir, filename)
 
     return app
 
