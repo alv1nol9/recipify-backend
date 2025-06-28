@@ -1,14 +1,16 @@
-from flask import request, jsonify
+import os
+from flask import request, jsonify, current_app
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from werkzeug.utils import secure_filename
+
 from server.models import db, User, Recipe, Comment
 from server.auth import register_user, login_user, get_current_user
 
 def init_routes(app):
-    # Auth Routes
+    # ---------------- Auth Routes ----------------
     @app.route('/api/register', methods=['POST'])
     def register():
         data = request.get_json()
-
         if not data:
             return jsonify({'message': 'Missing JSON in request'}), 400
 
@@ -21,7 +23,6 @@ def init_routes(app):
 
         return register_user(username, email, password)
 
-
     @app.route('/api/login', methods=['POST'])
     def login():
         data = request.get_json()
@@ -32,7 +33,7 @@ def init_routes(app):
     def profile():
         return get_current_user()
 
-    # Recipe Routes
+    # ---------------- Recipe Routes ----------------
     @app.route('/api/recipes', methods=['GET', 'POST'])
     @jwt_required()
     def recipes():
@@ -82,7 +83,7 @@ def init_routes(app):
             db.session.commit()
             return jsonify({"message": "Recipe deleted"}), 200
 
-    # Comment Routes
+    # ---------------- Comment Routes ----------------
     @app.route('/api/comments/<int:recipe_id>', methods=['POST'])
     @jwt_required()
     def add_comment(recipe_id):
@@ -107,14 +108,14 @@ def init_routes(app):
         db.session.commit()
         return jsonify({"message": "Comment deleted"}), 200
 
-    # Search Route
+    # ---------------- Search Route ----------------
     @app.route('/api/search', methods=['GET'])
     def search():
         query = request.args.get('q', '')
         recipes = Recipe.query.filter(Recipe.title.contains(query)).all()
         return jsonify([r.to_dict() for r in recipes]), 200
 
-    # User Routes
+    # ---------------- User Routes ----------------
     @app.route('/api/users', methods=['GET'])
     @jwt_required()
     def get_users():
@@ -158,3 +159,23 @@ def init_routes(app):
         db.session.delete(user)
         db.session.commit()
         return jsonify({"message": "User deleted"}), 200
+
+    # ---------------- Upload Image Route ----------------
+    @app.route('/api/upload', methods=['POST'])
+    @jwt_required()
+    def upload_image():
+        if 'image' not in request.files:
+            return jsonify({'error': 'No image file provided'}), 400
+
+        file = request.files['image']
+        if file.filename == '':
+            return jsonify({'error': 'No selected file'}), 400
+
+        filename = secure_filename(file.filename)
+        uploads_dir = os.path.join(os.getcwd(), 'uploads')
+        os.makedirs(uploads_dir, exist_ok=True)
+
+        file_path = os.path.join(uploads_dir, filename)
+        file.save(file_path)
+
+        return jsonify({'url': f'/uploads/{filename}'}), 200
