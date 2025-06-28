@@ -4,7 +4,7 @@ from flask_migrate import Migrate
 import os
 
 from server.config import Config
-from server.models import db
+from server.models.base import db
 from server.controllers.routes import init_routes
 
 def create_app():
