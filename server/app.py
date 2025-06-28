@@ -15,7 +15,7 @@ def create_app():
     migrate = Migrate(app, db)
     CORS(app)
 
-    from server import models  # 👈 THIS is what triggers relationship setup
+    from server import models  # ✅ Ensure model relationships are loaded
 
     init_routes(app)
 
