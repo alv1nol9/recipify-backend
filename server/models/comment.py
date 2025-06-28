@@ -1,7 +1,4 @@
-from flask_sqlalchemy import SQLAlchemy
 from server.models.base import db
-
-db = SQLAlchemy()
 
 class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -13,6 +10,5 @@ class Comment(db.Model):
         return {
             "id": self.id,
             "text": self.text,
-            "user": self.author.username,  # from relationship
             "recipe_id": self.recipe_id,
         }

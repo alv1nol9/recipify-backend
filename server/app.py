@@ -2,7 +2,7 @@ from flask import Flask, send_from_directory
 from flask_cors import CORS
 from flask_migrate import Migrate
 import os
-
+from flask_jwt_extended import JWTManager
 from server.config import Config
 from server.models.base import db
 from server.controllers.routes import init_routes
@@ -15,7 +15,9 @@ def create_app():
     migrate = Migrate(app, db)
     CORS(app)
 
-    from server import models  # ✅ Ensure model relationships are loaded
+    jwt = JWTManager(app)  # ✅ ADD THIS
+
+    from server import models
 
     init_routes(app)
 
