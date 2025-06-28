@@ -1,6 +1,8 @@
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from . import db
+from .recipe import Recipe
+from .comment import Comment
 
 db = SQLAlchemy()
 
