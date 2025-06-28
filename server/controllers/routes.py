@@ -8,7 +8,19 @@ def init_routes(app):
     @app.route('/api/register', methods=['POST'])
     def register():
         data = request.get_json()
-        return register_user(data['username'], data['email'], data['password'])
+
+        if not data:
+            return jsonify({'message': 'Missing JSON in request'}), 400
+
+        username = data.get('username')
+        email = data.get('email')
+        password = data.get('password')
+
+        if not all([username, email, password]):
+            return jsonify({'message': 'Username, email, and password are required'}), 400
+
+        return register_user(username, email, password)
+
 
     @app.route('/api/login', methods=['POST'])
     def login():
