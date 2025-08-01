@@ -59,13 +59,15 @@ def init_routes(app):
     @jwt_required()
     def recipe_detail(recipe_id):
         recipe = Recipe.query.get_or_404(recipe_id)
+        current_user_id = get_jwt_identity()
+        current_user = User.query.get(current_user_id)
 
         if request.method == 'GET':
             return jsonify(recipe.to_dict()), 200
 
         elif request.method == 'PUT':
-            if recipe.user_id != get_jwt_identity():
-                return jsonify({"message": "Unauthorized"}), 403
+            if recipe.user_id != current_user_id:
+                return jsonify({"message": "You are not authorized to update this recipe."}), 403
 
             data = request.get_json()
             recipe.title = data.get('title', recipe.title)
@@ -76,8 +78,14 @@ def init_routes(app):
             return jsonify(recipe.to_dict()), 200
 
         elif request.method == 'DELETE':
-            if recipe.user_id != get_jwt_identity():
-                return jsonify({"message": "Unauthorized"}), 403
+            print("🔐 Current user ID:", current_user_id)
+            print("👤 Recipe owner ID:", recipe.user_id)
+
+            # Optional: Allow admins to delete any recipe
+            is_admin = hasattr(current_user, "role") and current_user.role == "admin"
+
+            if recipe.user_id != current_user_id and not is_admin:
+                return jsonify({"message": "You are not authorized to delete this recipe."}), 403
 
             db.session.delete(recipe)
             db.session.commit()
@@ -102,7 +110,7 @@ def init_routes(app):
     def delete_comment(comment_id):
         comment = Comment.query.get_or_404(comment_id)
         if comment.user_id != get_jwt_identity():
-            return jsonify({"message": "Unauthorized"}), 403
+            return jsonify({"message": "You are not authorized to delete this comment."}), 403
 
         db.session.delete(comment)
         db.session.commit()
@@ -133,7 +141,7 @@ def init_routes(app):
     def update_user(user_id):
         current_user_id = get_jwt_identity()
         if current_user_id != user_id:
-            return jsonify({"message": "Unauthorized"}), 403
+            return jsonify({"message": "You are not authorized to update this user."}), 403
 
         user = User.query.get_or_404(user_id)
         data = request.get_json()
@@ -153,7 +161,7 @@ def init_routes(app):
     def delete_user(user_id):
         current_user_id = get_jwt_identity()
         if current_user_id != user_id:
-            return jsonify({"message": "Unauthorized"}), 403
+            return jsonify({"message": "You are not authorized to delete this user."}), 403
 
         user = User.query.get_or_404(user_id)
         db.session.delete(user)
